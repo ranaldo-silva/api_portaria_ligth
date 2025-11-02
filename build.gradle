@@ -13,19 +13,14 @@ repositories {
 }
 
 dependencies {
-	// --- Spring Boot Starters ---
+	// --- Dependências principais ---
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.postgresql:postgresql' // ✅ Driver do PostgreSQL
 
-	// --- PostgreSQL JDBC Driver ---
-	implementation 'org.postgresql:postgresql:42.7.3'
-
-	// --- Lombok (gera getters/setters automaticamente) ---
-	implementation 'org.projectlombok:lombok'
+	// --- Lombok (para evitar boilerplate) ---
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
-
-	// --- Banco em memória (opcional, apenas para testes locais) ---
-	runtimeOnly 'com.h2database:h2'
 
 	// --- Testes ---
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
