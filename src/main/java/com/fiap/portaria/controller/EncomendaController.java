@@ -9,6 +9,7 @@ import java.util.List;
 @RequestMapping("/encomendas")
 @CrossOrigin("*")
 public class EncomendaController {
+
     private final EncomendaService service;
 
     public EncomendaController(EncomendaService service) {
@@ -22,6 +23,13 @@ public class EncomendaController {
 
     @PostMapping
     public Encomenda salvar(@RequestBody Encomenda e) {
+        return service.salvar(e);
+    }
+
+    // ✅ NOVO MÉTODO — Atualizar encomenda existente
+    @PutMapping("/{id}")
+    public Encomenda atualizar(@PathVariable Long id, @RequestBody Encomenda e) {
+        e.setId(id);
         return service.salvar(e);
     }
 

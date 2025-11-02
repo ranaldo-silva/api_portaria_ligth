@@ -19,4 +19,15 @@ public class Encomenda {
 
     @ManyToOne
     private Morador morador;
+
+    // ✅ Gera token e data automaticamente ao salvar
+    @PrePersist
+    public void gerarCamposPadrao() {
+        if (token == null || token.isBlank()) {
+            token = "ENC-" + System.currentTimeMillis();
+        }
+        if (dataRecebimento == null) {
+            dataRecebimento = LocalDateTime.now();
+        }
+    }
 }

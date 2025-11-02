@@ -25,6 +25,13 @@ public class MoradorController {
         return service.salvar(m);
     }
 
+    // ✅ NOVO MÉTODO: Atualizar morador existente
+    @PutMapping("/{id}")
+    public Morador atualizar(@PathVariable Long id, @RequestBody Morador m) {
+        m.setId(id);
+        return service.salvar(m);
+    }
+
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Long id) {
         service.excluir(id);
