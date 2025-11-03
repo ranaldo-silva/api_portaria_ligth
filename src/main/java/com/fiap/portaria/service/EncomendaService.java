@@ -7,6 +7,7 @@ import com.fiap.portaria.repository.MoradorRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,15 +27,15 @@ public class EncomendaService {
     }
 
     public Encomenda salvar(Encomenda e) {
-        // 🔍 Garante que o morador realmente existe
+        // 🔍 Garante que o morador realmente existe e carrega completo
         if (e.getMorador() != null && e.getMorador().getId() != null) {
             Optional<Morador> m = moradorRepo.findById(e.getMorador().getId());
             m.ifPresent(e::setMorador);
         }
 
-        // 🔧 Garante data de recebimento e token
+        // 🔧 Garante data de recebimento correta (fuso Brasil)
         if (e.getDataRecebimento() == null) {
-            e.setDataRecebimento(LocalDateTime.now());
+            e.setDataRecebimento(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
         }
 
         return repo.save(e);

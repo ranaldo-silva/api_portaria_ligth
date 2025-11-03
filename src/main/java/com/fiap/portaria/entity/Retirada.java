@@ -2,6 +2,7 @@ package com.fiap.portaria.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Entity
 @Table(name = "retiradas")
@@ -13,8 +14,7 @@ public class Retirada {
 
     private String morador;
     private String encomenda;
-
-    private LocalDateTime dataRetirada = LocalDateTime.now();
+    private LocalDateTime dataRetirada;
 
     public Retirada() {
     }
@@ -22,7 +22,14 @@ public class Retirada {
     public Retirada(String morador, String encomenda) {
         this.morador = morador;
         this.encomenda = encomenda;
-        this.dataRetirada = LocalDateTime.now();
+        this.dataRetirada = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.dataRetirada == null) {
+            this.dataRetirada = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        }
     }
 
     public Long getId() {
