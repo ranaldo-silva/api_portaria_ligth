@@ -26,11 +26,12 @@ public class RetiradaController {
     @PostMapping
     public ResponseEntity<Retirada> salvar(@RequestBody Retirada r) {
         // 🚨 Verificação de segurança — evita nulos
-        if (r.getMorador() == null || r.getEncomenda() == null) {
-            return ResponseEntity.badRequest().build();
+        if (r == null || r.getMorador() == null || r.getEncomenda() == null) {
+            return ResponseEntity.badRequest().body(null);
         }
 
         Retirada salva = service.salvar(r);
+        // ✅ Retorna corpo JSON correto (não vazio)
         return ResponseEntity.ok(salva);
     }
 }
