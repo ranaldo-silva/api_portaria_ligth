@@ -3,6 +3,7 @@ package com.fiap.portaria.entity;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "retiradas")
@@ -14,6 +15,7 @@ public class Retirada {
 
     private String morador;
     private String encomenda;
+
     private LocalDateTime dataRetirada;
 
     public Retirada() {
@@ -22,16 +24,20 @@ public class Retirada {
     public Retirada(String morador, String encomenda) {
         this.morador = morador;
         this.encomenda = encomenda;
-        this.dataRetirada = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        // 🔧 Ajuste: usa ZonedDateTime para aplicar fuso corretamente
+        ZonedDateTime agoraSP = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+        this.dataRetirada = agoraSP.toLocalDateTime();
     }
 
     @PrePersist
     public void prePersist() {
         if (this.dataRetirada == null) {
-            this.dataRetirada = LocalDateTime.now(ZoneId.of("America/Sao_Paulo"));
+            ZonedDateTime agoraSP = ZonedDateTime.now(ZoneId.of("America/Sao_Paulo"));
+            this.dataRetirada = agoraSP.toLocalDateTime();
         }
     }
 
+    // Getters e setters
     public Long getId() {
         return id;
     }
