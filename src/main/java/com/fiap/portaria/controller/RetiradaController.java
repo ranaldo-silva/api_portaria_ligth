@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @RestController
@@ -36,24 +37,35 @@ public class RetiradaController {
 
         System.out.println("📦 Recebido no backend: " + r);
 
-        // ✅ Verifica campos obrigatórios
         if (r.getMorador() == null || r.getEncomenda() == null) {
             return ResponseEntity.badRequest().body("{\"erro\":\"Campos morador/encomenda estão nulos\"}");
         }
 
         try {
-            // ✅ Busca a encomenda pelo token e marca como retirada
+            // 🔎 Busca encomenda pelo token
             Encomenda e = encomendaRepo.findByToken(r.getEncomenda());
             if (e != null) {
                 e.setRetirada(true);
-                e.setRetiradaEm(LocalDateTime.now());
+                e.setRetiradaEm(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+
+                // ✅ Se a encomenda tiver morador vinculado, usar o nome completo
+                if (e.getMorador() != null) {
+                    String nomeCompleto = e.getMorador().getNome() + " " + e.getMorador().getSobrenome();
+                    r.setMorador(nomeCompleto);
+                } else if (r.getMorador() == null) {
+                    r.setMorador("Desconhecido");
+                }
+
                 encomendaRepo.save(e);
                 System.out.println("✅ Encomenda marcada como retirada: " + e.getToken());
             } else {
                 System.out.println("⚠️ Nenhuma encomenda encontrada com token: " + r.getEncomenda());
+                r.setMorador("Desconhecido");
             }
 
-            // ✅ Salva registro da retirada
+            // ✅ Hora de retirada ajustada (fuso Brasil)
+            r.setDataRetirada(LocalDateTime.now(ZoneId.of("America/Sao_Paulo")));
+
             Retirada salva = service.salvar(r);
             return ResponseEntity.ok(salva);
 

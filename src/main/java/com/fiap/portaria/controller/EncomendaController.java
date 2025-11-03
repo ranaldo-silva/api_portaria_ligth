@@ -26,7 +26,6 @@ public class EncomendaController {
         return service.salvar(e);
     }
 
-    // ✅ NOVO MÉTODO — Atualizar encomenda existente
     @PutMapping("/{id}")
     public Encomenda atualizar(@PathVariable Long id, @RequestBody Encomenda e) {
         e.setId(id);
