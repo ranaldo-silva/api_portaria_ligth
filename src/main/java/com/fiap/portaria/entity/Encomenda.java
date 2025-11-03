@@ -21,7 +21,9 @@ public class Encomenda {
     private boolean retirada = false;
     private LocalDateTime retiradaEm;
 
-    @ManyToOne
+    // 🔧 Mudança importante: forçar fetch EAGER para trazer o morador completo no JSON
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "morador_id")
     private Morador morador;
 
     @PrePersist
