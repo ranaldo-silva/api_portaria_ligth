@@ -6,10 +6,13 @@ import com.fiap.portaria.repository.EncomendaRepository;
 import com.fiap.portaria.repository.MoradorRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EncomendaService {
+
     private final EncomendaRepository repo;
     private final MoradorRepository moradorRepo;
 
@@ -23,10 +26,15 @@ public class EncomendaService {
     }
 
     public Encomenda salvar(Encomenda e) {
-        // ✅ Garante que o morador seja carregado corretamente
+        // 🔍 Garante que o morador realmente existe
         if (e.getMorador() != null && e.getMorador().getId() != null) {
-            Morador morador = moradorRepo.findById(e.getMorador().getId()).orElse(null);
-            e.setMorador(morador);
+            Optional<Morador> m = moradorRepo.findById(e.getMorador().getId());
+            m.ifPresent(e::setMorador);
+        }
+
+        // 🔧 Garante data de recebimento e token
+        if (e.getDataRecebimento() == null) {
+            e.setDataRecebimento(LocalDateTime.now());
         }
 
         return repo.save(e);
