@@ -24,14 +24,21 @@ public class RetiradaController {
     }
 
     @PostMapping
-    public ResponseEntity<Retirada> salvar(@RequestBody Retirada r) {
-        // 🚨 Verificação de segurança — evita nulos
-        if (r == null || r.getMorador() == null || r.getEncomenda() == null) {
-            return ResponseEntity.badRequest().body(null);
+    public ResponseEntity<?> salvar(@RequestBody Retirada r) {
+        if (r == null) {
+            return ResponseEntity.badRequest().body("{\"erro\":\"Corpo da requisição vazio\"}");
+        }
+
+        System.out.println("📦 Recebido no backend: " + r);
+
+        // Garantir que campos não sejam nulos
+        if (r.getMorador() == null || r.getEncomenda() == null) {
+            return ResponseEntity.badRequest().body("{\"erro\":\"Campos morador/encomenda estão nulos\"}");
         }
 
         Retirada salva = service.salvar(r);
-        // ✅ Retorna corpo JSON correto (não vazio)
+
+        // ✅ Retorna JSON corretamente, evitando resposta vazia
         return ResponseEntity.ok(salva);
     }
 }
