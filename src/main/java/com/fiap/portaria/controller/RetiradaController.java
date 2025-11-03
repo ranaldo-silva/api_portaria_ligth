@@ -1,10 +1,13 @@
 package com.fiap.portaria.controller;
 
+import com.fiap.portaria.entity.Encomenda;
 import com.fiap.portaria.entity.Retirada;
+import com.fiap.portaria.repository.EncomendaRepository;
 import com.fiap.portaria.service.RetiradaService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -13,9 +16,11 @@ import java.util.List;
 public class RetiradaController {
 
     private final RetiradaService service;
+    private final EncomendaRepository encomendaRepo;
 
-    public RetiradaController(RetiradaService service) {
+    public RetiradaController(RetiradaService service, EncomendaRepository encomendaRepo) {
         this.service = service;
+        this.encomendaRepo = encomendaRepo;
     }
 
     @GetMapping
@@ -31,14 +36,31 @@ public class RetiradaController {
 
         System.out.println("📦 Recebido no backend: " + r);
 
-        // Garantir que campos não sejam nulos
+        // ✅ Verifica campos obrigatórios
         if (r.getMorador() == null || r.getEncomenda() == null) {
             return ResponseEntity.badRequest().body("{\"erro\":\"Campos morador/encomenda estão nulos\"}");
         }
 
-        Retirada salva = service.salvar(r);
+        try {
+            // ✅ Busca a encomenda pelo token e marca como retirada
+            Encomenda e = encomendaRepo.findByToken(r.getEncomenda());
+            if (e != null) {
+                e.setRetirada(true);
+                e.setRetiradaEm(LocalDateTime.now());
+                encomendaRepo.save(e);
+                System.out.println("✅ Encomenda marcada como retirada: " + e.getToken());
+            } else {
+                System.out.println("⚠️ Nenhuma encomenda encontrada com token: " + r.getEncomenda());
+            }
 
-        // ✅ Retorna JSON corretamente, evitando resposta vazia
-        return ResponseEntity.ok(salva);
+            // ✅ Salva registro da retirada
+            Retirada salva = service.salvar(r);
+            return ResponseEntity.ok(salva);
+
+        } catch (Exception ex) {
+            System.out.println("❌ Erro ao processar retirada: " + ex.getMessage());
+            return ResponseEntity.internalServerError()
+                    .body("{\"erro\":\"Falha ao registrar retirada\"}");
+        }
     }
 }
